@@ -1,0 +1,3 @@
+telethon>=1.44
+mcp>=1.28
+python-dotenv>=1.0
