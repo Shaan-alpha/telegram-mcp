@@ -1,6 +1,6 @@
 # Telegram MCP Server
 
-A local [Model Context Protocol](https://modelcontextprotocol.io) server that gives an AI agent — Claude Code, Claude Desktop, or any MCP client — controlled access to **your own Telegram account**: list chats, read history, search, and send messages, through Telegram's MTProto API.
+A local [Model Context Protocol](https://modelcontextprotocol.io) server that gives an AI agent (Claude Code, Claude Desktop, or any MCP client) controlled access to **your own Telegram account**: list chats, read history, search, and send messages, through Telegram's MTProto API.
 
 Built with Python + [Telethon](https://docs.telethon.dev). Runs entirely on your machine; your login session never leaves it.
 
@@ -8,15 +8,15 @@ Built with Python + [Telethon](https://docs.telethon.dev). Runs entirely on your
 
 ## Why
 
-Telegram's **Bot API can't see your existing chats** — a bot is a separate identity and only receives messages explicitly sent to it. To let an agent work with *your* real conversations you need the **MTProto client API**, authenticated as your user account. This project wraps that in a small, focused MCP server so any MCP-capable agent can read and act on your Telegram — without you writing glue code each time.
+Telegram's **Bot API can't see your existing chats**; a bot is a separate identity and only receives messages explicitly sent to it. To let an agent work with *your* real conversations you need the **MTProto client API**, authenticated as your user account. This project wraps that in a small, focused MCP server so any MCP-capable agent can read and act on your Telegram; without you writing glue code each time.
 
 ## Features
 
 - **6 tools** covering the common read/write actions (see below)
-- **Local-only** — credentials and session live in a git-ignored `.env`; nothing is sent anywhere except Telegram
-- **Standard MCP stdio server** — works with Claude Code, Claude Desktop, or any MCP client
-- **One-time login** — interactive script stores a reusable session string; no re-auth on every run
-- **Small and readable** — ~150 lines of Python, easy to audit and extend
+- **Local-only** (credentials and session live in a git-ignored `.env`; nothing is sent anywhere except Telegram
+- **Standard MCP stdio server**) works with Claude Code, Claude Desktop, or any MCP client
+- **One-time login** (interactive script stores a reusable session string; no re-auth on every run
+- **Small and readable**) ~150 lines of Python, easy to audit and extend
 
 ## Tools
 
@@ -69,7 +69,7 @@ Enter your `api_id`/`api_hash`, phone number (with country code), and the login 
 claude mcp add telegram --scope user -- "/abs/path/.venv/bin/python" "/abs/path/server.py"
 ```
 
-**Claude Desktop** — add to `claude_desktop_config.json`:
+**Claude Desktop**; add to `claude_desktop_config.json`:
 
 ```json
 {
@@ -110,13 +110,13 @@ The agent calls `search_all("invoice")`, which returns:
 
 ## Security
 
-- **Keep `.env` private.** The `SESSION_STRING` is equivalent to being logged in as you. It is git-ignored — never commit it.
+- **Keep `.env` private.** The `SESSION_STRING` is equivalent to being logged in as you. It is git-ignored, never commit it.
 - Everything runs locally; the server talks only to Telegram's servers.
 - Automating a *user* account is a Telegram ToS gray area. Reading your own account is generally fine; keep sending human-paced and avoid bulk/spam activity to stay clear of account limits.
 
 ## Limitations
 
-- No automated test suite yet — verified manually against a live account.
+- No automated test suite yet; verified manually against a live account.
 - `search_messages` searches a single chat; use `search_all` for a global search.
 - Display-name resolution falls back to scanning your dialog list, so exact usernames/ids are faster and more reliable.
 
