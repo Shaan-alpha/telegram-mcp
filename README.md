@@ -10,13 +10,64 @@ Built with Python + [Telethon](https://docs.telethon.dev). Runs entirely on your
 
 Telegram's **Bot API can't see your existing chats**; a bot is a separate identity and only receives messages explicitly sent to it. To let an agent work with *your* real conversations you need the **MTProto client API**, authenticated as your user account. This project wraps that in a small, focused MCP server so any MCP-capable agent can read and act on your Telegram; without you writing glue code each time.
 
+## How it fits together
+
+A Telegram **bot** is a separate identity and only sees messages sent to it. To let an agent
+work with *your* conversations, the server authenticates as your user account over MTProto,
+which is why the session string matters as much as it does.
+
+```mermaid
+flowchart LR
+    AGENT["<b>MCP client</b><br/>Claude Code · Claude Desktop<br/>or any MCP-capable agent"]
+
+    subgraph LOCAL ["Your machine — nothing leaves it but Telegram traffic"]
+        direction TB
+        SRV["<b>server.py</b> · FastMCP stdio server<br/>connects lazily on first tool call<br/>verifies the session is authorized"]
+        TOOLS["<b>6 tools</b><br/>get_me · list_chats · get_history<br/>search_messages · search_all · send_message"]
+        ENV[("<b>.env</b> · git-ignored<br/>api_id · api_hash<br/><b>SESSION_STRING</b><br/><i>equivalent to being logged in as you</i>")]
+        LOGIN["<b>login.py</b> · run once<br/>phone + code + 2FA → StringSession"]
+        SRV --> TOOLS
+        LOGIN -->|"writes"| ENV
+        ENV -->|"reads"| SRV
+    end
+
+    subgraph TL ["Telethon → MTProto"]
+        direction TB
+        M1["iter_dialogs"]
+        M2["iter_messages"]
+        M3["SearchGlobalRequest"]
+        M4["send_message"]
+    end
+
+    TG[("<b>Telegram</b><br/>your real account,<br/>your existing chats")]
+    BOT(["Bot API<br/><i>cannot see your chats —<br/>this is why MTProto</i>"])
+
+    AGENT <-->|"MCP over stdio"| SRV
+    TOOLS --> M1
+    TOOLS --> M2
+    TOOLS --> M3
+    TOOLS --> M4
+    TL <--> TG
+    BOT -.->|"✗"| TG
+
+    classDef secret fill:#7f1d1d,stroke:#f87171,stroke-width:2px,color:#fee2e2
+    classDef no fill:#0f172a,stroke:#475569,stroke-width:1.5px,color:#94a3b8
+    classDef core fill:#312e81,stroke:#818cf8,stroke-width:2px,color:#e2e8f0
+    class ENV secret
+    class BOT no
+    class SRV,TOOLS core
+```
+
+Results come back as plain JSON-serializable dicts, so the agent summarizes from structured
+data rather than scraped text.
+
 ## Features
 
 - **6 tools** covering the common read/write actions (see below)
-- **Local-only** (credentials and session live in a git-ignored `.env`; nothing is sent anywhere except Telegram
-- **Standard MCP stdio server**) works with Claude Code, Claude Desktop, or any MCP client
-- **One-time login** (interactive script stores a reusable session string; no re-auth on every run
-- **Small and readable**) ~150 lines of Python, easy to audit and extend
+- **Local-only** — credentials and session live in a git-ignored `.env`; nothing is sent anywhere except Telegram
+- **Standard MCP stdio server** — works with Claude Code, Claude Desktop, or any MCP client
+- **One-time login** — interactive script stores a reusable session string; no re-auth on every run
+- **Small and readable** — ~150 lines of Python, easy to audit and extend
 
 ## Tools
 
