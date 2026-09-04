@@ -67,7 +67,7 @@ data rather than scraped text.
 - **Local-only** — credentials and session live in a git-ignored `.env`; nothing is sent anywhere except Telegram
 - **Standard MCP stdio server** — works with Claude Code, Claude Desktop, or any MCP client
 - **One-time login** — interactive script stores a reusable session string; no re-auth on every run
-- **Small and readable** — ~150 lines of Python, easy to audit and extend
+- **Small and readable** — under 300 lines of Python, easy to audit and extend
 
 ## Tools
 
@@ -87,7 +87,7 @@ data rather than scraped text.
 ### 1. Install
 
 ```bash
-git clone https://github.com/<you>/telegram-mcp.git
+git clone https://github.com/Shaan-alpha/telegram-mcp.git
 cd telegram-mcp
 python -m venv .venv
 
